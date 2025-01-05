@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LLM Evaluation Platform</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #f4f4f4;
+        font-family: "Source Sans Pro", sans-serif;
+        color: #333;
+        padding: 20px;
+      }
+
+      .banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #2e3d49;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+      }
+
+      .banner h1 {
+        margin: 0;
+        font-size: 1.8em;
+      }
+
+      .banner button {
+        background-color: #4a5a6a;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+
+      .banner button:hover {
+        background-color: #3a4a5a;
+      }
+
+      .section-card {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+
+      .section-card h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .button-group {
+        margin: 20px 0;
+      }
+
+      .btn {
+        font-size: 1em;
+        padding: 10px 20px;
+        border-radius: 5px;
+      }
+
+      .results-table {
+        overflow-x: auto;
+      }
+
+      .table {
+        table-layout: fixed; /* Ensures cells maintain their size */
+        width: 100%;
+      }
+
+      .table th,
+      .table td {
+        vertical-align: middle;
+        white-space: normal; /* Allow text to wrap */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px; /* Set a max width for cells */
+      }
+
+      .table th {
+        background-color: #f8f9fa;
+      }
+
+      .table td[contenteditable="true"] {
+        background-color: #e9ecef;
+        cursor: text;
+      }
+
+      .results-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      .results-table td {
+        padding: 12px;
+        vertical-align: middle;
+      }
+
+      .results-table td[contenteditable="true"] {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        padding: 8px;
+      }
+
+      .results-table td[contenteditable="true"]:focus {
+        outline: 2px solid #007bff;
+        border: 1px solid #007bff;
+      }
+
+      .model-response {
+        margin-bottom: 8px;
+      }
+
+      .factuality-score {
+        border-top: 1px solid #dee2e6;
+        padding-top: 8px;
+      }
+
+      .response-time {
+        border-top: 1px solid #dee2e6;
+        padding-top: 8px;
+      }
+
+      .text-secondary {
+        color: #6c757d !important;
+      }
+
+      .mt-2 {
+        margin-top: 0.5rem !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Banner -->
+      <div class="banner">
+        <h1>LLM Evaluation Platform</h1>
+        <a href="{{ url_for('experiments') }}" class="btn btn-primary"
+          >Experiments</a
+        >
+      </div>
+
+      <!-- Experiment Creation Section -->
+      <div class="section-card">
+        <h2>New Experiment</h2>
+        <form
+          id="experimentForm"
+          method="post"
+          action="{{ url_for('submit_prompt') }}"
+        >
+          <div class="mb-3">
+            <label for="experimentName" class="form-label"
+              >Experiment Name</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="experimentName"
+              name="experiment_name"
+              value="{{ experiment.name if experiment else '' }}"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="systemPrompt" class="form-label">System Prompt</label>
+            <textarea
+              class="form-control"
+              id="systemPrompt"
+              name="system_prompt"
+              rows="4"
+              required
+            >
+{{ experiment.system_prompt if experiment else '' }}</textarea
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Select Models</label>
+            <div id="modelSelection">
+              <!-- Commenting out the GPT checkbox -->
+              <!--
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="GPT-3.5 Turbo" id="gptCheckbox">
+                  <label class="form-check-label" for="gptCheckbox">
+                      GPT-3.5 Turbo
+                  </label>
+              </div>
+              -->
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="Gemini"
+                  id="geminiCheckbox"
+                />
+                <label class="form-check-label" for="geminiCheckbox">
+                  Gemini
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="Mistral"
+                  id="mistralCheckbox"
+                />
+                <label class="form-check-label" for="mistralCheckbox">
+                  Mistral
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="Llama"
+                  id="llamaCheckbox"
+                />
+                <label class="form-check-label" for="llamaCheckbox">
+                  Llama
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="submit" class="btn btn-success">
+              Run Experiment
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Results Section -->
+      <div class="section-card" id="results-section" style="display: none">
+        <h2>Results</h2>
+        <div class="results-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <!-- Headers will be dynamically populated -->
+              </tr>
+            </thead>
+            <tbody id="resultsBody">
+              <!-- Results will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        <button type="button" class="btn btn-secondary" id="addTestCase">
+          Add Test Case
+        </button>
+        <button type="button" class="btn btn-primary" id="submitTestCases">
+          Submit Test Case
+        </button>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Handle Run Experiment button click
+        $("#experimentForm").submit(function (event) {
+          event.preventDefault();
+
+          const experimentName = $("#experimentName").val().trim();
+          const systemPrompt = $("#systemPrompt").val().trim();
+          const selectedModels = [];
+          $("#modelSelection input:checked").each(function () {
+            selectedModels.push($(this).val());
+          });
+
+          // Get existing experiment ID if it exists
+          const experimentId = window.currentExperimentId || null;
+
+          // Validation checks...
+          if (!experimentName || !systemPrompt || selectedModels.length === 0) {
+            alert("Please fill in all fields and select at least one model.");
+            return;
+          }
+
+          // Submit the form data via AJAX
+          $.ajax({
+            url: "{{ url_for('submit_prompt') }}",
+            type: "POST",
+            data: {
+              experiment_name: experimentName,
+              system_prompt: systemPrompt,
+              selected_models: selectedModels,
+              experiment_id: experimentId, // Pass the experiment ID if it exists
+            },
+            success: function (response) {
+              alert(response.message);
+              window.currentExperimentId = response.experiment_id;
+              window.selectedModels = selectedModels;
+
+              // Show and initialize results section
+              $("#results-section").show();
+              initializeResultsTable(selectedModels);
+
+              // Load existing responses if any
+              if (
+                response.existing_responses &&
+                response.existing_responses.length > 0
+              ) {
+                loadExistingResponses(response.existing_responses);
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Error:", error);
+              alert(
+                "An error occurred while creating/updating the experiment."
+              );
+            },
+          });
+        });
+
+        // Function to initialize results table
+        function initializeResultsTable(selectedModels) {
+          const resultsTable = $(".results-table table");
+          resultsTable.empty();
+
+          // Create and append thead with headers
+          const thead = $("<thead></thead>");
+          const headerRow = $("<tr></tr>");
+          headerRow.append("<th>Test Case</th>");
+          headerRow.append("<th>Expected Output</th>");
+          selectedModels.forEach((model) => {
+            headerRow.append(`<th>${model}</th>`);
+          });
+          headerRow.append("<th>Actions</th>");
+          thead.append(headerRow);
+          resultsTable.append(thead);
+
+          // Create and append tbody
+          const tbody = $("<tbody id='resultsBody'></tbody>");
+          resultsTable.append(tbody);
+        }
+
+        // Function to load existing responses
+        function loadExistingResponses(responses) {
+          const resultsBody = $("#resultsBody");
+          responses.forEach((response) => {
+            const row = $("<tr></tr>");
+            row.append(`<td contenteditable="true">${response.test_case}</td>`);
+            row.append(
+              `<td contenteditable="true">${response.expected_output}</td>`
+            );
+
+            window.selectedModels.forEach((model) => {
+              const modelResponse = response[model] || "";
+              const factuality = response[`${model}_factuality`] || "";
+              row.append(`
+                            <td>
+                              <div class="model-response">${modelResponse}</div>
+                              <div class="factuality-score small text-secondary mt-2">
+                                Factuality Score: ${factuality}
+                              </div>
+                            </td>
+                          `);
+            });
+
+            row.append(`
+                          <td>
+                            <button class="btn btn-danger btn-sm delete-test-case">Delete</button>
+                          </td>
+                        `);
+            resultsBody.append(row);
+          });
+        }
+
+        // Update Add Test Case button to use stored selected models
+        $("#addTestCase").click(function () {
+          if (!window.selectedModels) {
+            alert("Please run an experiment first.");
+            return;
+          }
+
+          const newRow = $("<tr></tr>");
+          newRow.append("<td contenteditable='true'></td>");
+          newRow.append("<td contenteditable='true'></td>");
+          window.selectedModels.forEach(() => {
+            newRow.append("<td></td>");
+          });
+          newRow.append(`
+                        <td>
+                          <button class="btn btn-danger btn-sm delete-test-case">Delete</button>
+                        </td>
+                      `);
+          $("#resultsBody").append(newRow);
+        });
+
+        // Handle Delete Test Case button click
+        $(document).on("click", ".delete-test-case", function () {
+          $(this).closest("tr").remove();
+        });
+
+        // Handle Submit Test Case button click
+        $("#submitTestCases").click(function () {
+          const lastRow = $("#resultsBody tr").last();
+          const testCase = lastRow.find("td:eq(0)").text().trim();
+          const expectedOutput = lastRow.find("td:eq(1)").text().trim();
+
+          if (!testCase || !expectedOutput) {
+            alert(
+              "Please ensure the last test case and expected output are filled."
+            );
+            return;
+          }
+
+          $.ajax({
+            url: "{{ url_for('evaluate_test_cases') }}",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+              test_cases: [{ testCase, expectedOutput }],
+              selected_models: $("#modelSelection input:checked")
+                .map(function () {
+                  return $(this).val();
+                })
+                .get(),
+            }),
+            success: function (response) {
+              updateResults(response.responses, expectedOutput);
+            },
+          });
+        });
+
+        // Function to update results table
+        function updateResults(responses, expectedOutput) {
+          const resultsBody = $("#resultsBody");
+          resultsBody.empty();
+          responses.forEach(function (res) {
+            const row = $("<tr></tr>");
+            row.append(`<td>${res.test_case}</td>`);
+            row.append(`<td>${res.expected_output}</td>`);
+            window.selectedModels.forEach((model) => {
+              const modelResponse = res[model] || "";
+              const factuality = calculateFactuality(
+                modelResponse,
+                expectedOutput
+              );
+              const responseTime = res[`${model}_response_time`] || "N/A";
+              row.append(`
+                            <td>
+                              <div class="model-response">${modelResponse}</div>
+                              <div class="factuality-score small text-secondary mt-2">
+                                Factuality Score: ${factuality}%
+                              </div>
+                              <div class="response-time small text-secondary mt-2">
+                                Response Time: ${responseTime}
+                              </div>
+                            </td>
+                          `);
+            });
+            row.append(`
+                          <td>
+                            <button class="btn btn-danger btn-sm delete-test-case">Delete</button>
+                          </td>
+                        `);
+            resultsBody.append(row);
+          });
+        }
+
+        // Function to calculate factuality
+        function calculateFactuality(response, expectedOutput) {
+          // Normalize the text: convert to lowercase and remove punctuation
+          const normalize = (text) => {
+            return text.toLowerCase().replace(/[^\w\s]/g, "");
+          };
+
+          const normalizedResponse = normalize(response);
+          const normalizedExpected = normalize(expectedOutput);
+
+          // Split into words
+          const responseWords = normalizedResponse.split(/\s+/).filter(Boolean);
+          const expectedWords = normalizedExpected.split(/\s+/).filter(Boolean);
+
+          if (expectedWords.length === 0) return 0;
+
+          // Calculate exact matches
+          const exactMatches = responseWords.filter((word) =>
+            expectedWords.includes(word)
+          ).length;
+
+          // Calculate partial matches using substring comparison
+          let partialMatches = 0;
+          responseWords.forEach((respWord) => {
+            if (!expectedWords.includes(respWord)) {
+              expectedWords.forEach((expWord) => {
+                if (expWord.includes(respWord) || respWord.includes(expWord)) {
+                  partialMatches += 0.5; // Award half points for partial matches
+                }
+              });
+            }
+          });
+
+          // Calculate final score
+          const score = Math.min(
+            100,
+            ((exactMatches + partialMatches) / expectedWords.length) * 100
+          );
+
+          // Ensure score is between 0 and 100
+          return Math.max(0, Math.min(100, score)).toFixed(2);
+        }
+
+        // Add this function to load existing experiment data
+        function loadExistingExperiment(experimentId) {
+          $.ajax({
+            url: `/experiment/${experimentId}`,
+            type: "GET",
+            success: function (response) {
+              // Set form values
+              $("#experimentName").val(response.experiment.name);
+              $("#systemPrompt").val(response.experiment.system_prompt);
+
+              // Check corresponding model checkboxes
+              response.experiment.selected_models.forEach((model) => {
+                $(`input[name="models"][value="${model}"]`).prop(
+                  "checked",
+                  true
+                );
+              });
+
+              // Store experiment data
+              window.currentExperimentId = response.experiment.id;
+              window.selectedModels = response.experiment.selected_models;
+
+              // Show results section
+              $("#results-section").show();
+
+              // Initialize and populate results table
+              initializeResultsTable(response.experiment.selected_models);
+              if (response.responses.length > 0) {
+                loadExistingResponses(response.responses);
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Error loading experiment:", error);
+              alert("Failed to load experiment data");
+            },
+          });
+        }
+
+        // Call this function when loading a continued experiment
+        if (window.initialExperimentId) {
+          loadExistingExperiment(window.initialExperimentId);
+        }
+      });
+    </script>
+  </body>
+</html>

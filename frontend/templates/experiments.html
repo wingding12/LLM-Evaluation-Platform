@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Experiments</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f4f4f4;
+        font-family: "Source Sans Pro", sans-serif;
+        color: #333;
+        padding: 20px;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .btn {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Experiments</h1>
+      <a href="{{ url_for('index') }}" class="btn btn-success mb-3"
+        >Create New Experiment</a
+      >
+      <form
+        action="{{ url_for('clear_history') }}"
+        method="post"
+        style="display: inline"
+        onsubmit="return confirm('Are you sure you want to clear all history? This action cannot be undone.');"
+      >
+        <button type="submit" class="btn btn-danger mb-3">Clear History</button>
+      </form>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>System Prompt</th>
+            <th>Last Modified</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for experiment in experiments %}
+          <tr>
+            <td>{{ experiment.name }}</td>
+            <td>{{ experiment.system_prompt }}</td>
+            <td>{{ experiment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+              <a
+                href="{{ url_for('continue_experiment', experiment_id=experiment.id) }}"
+                class="btn btn-primary btn-sm"
+                >Continue</a
+              >
+              <form
+                action="{{ url_for('delete_experiment', experiment_id=experiment.id) }}"
+                method="post"
+                style="display: inline"
+                onsubmit="return confirm('Are you sure you want to delete this experiment? This action cannot be undone.');"
+              >
+                <button type="submit" class="btn btn-danger btn-sm">
+                  Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary"
+        >Back to Home</a
+      >
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
