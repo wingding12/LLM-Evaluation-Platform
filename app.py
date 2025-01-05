@@ -51,11 +51,14 @@ def evaluate_test_cases():
     data = request.json
     test_cases = data.get('test_cases')
     selected_models = data.get('selected_models')
+    system_prompt = data.get('system_prompt')
 
     responses = []
     for test_case_data in test_cases:
         test_case_prompt = test_case_data['testCase']
         expected_output = test_case_data['expectedOutput']
+
+        combined_prompt = f"{system_prompt}\n\nUser: {test_case_prompt}"
 
         response_data = {
             'test_case': test_case_prompt,
@@ -68,7 +71,7 @@ def evaluate_test_cases():
                 start_time = time.time()
                 
                 model_func = model_functions(model_name)
-                result = model_func(test_case_prompt, expected_output)
+                result = model_func(combined_prompt, expected_output)
                 
                 end_time = time.time()
                 response_time = round(end_time - start_time, 2)
