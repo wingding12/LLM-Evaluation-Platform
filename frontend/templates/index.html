@@ -5,177 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LLM Evaluation Platform</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font for Shadcn UI -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
     <style>
+      :root {
+        --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 222.2 47.4% 11.2%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 222.2 84% 4.9%;
+        --radius: 0.5rem;
+      }
+
+      .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 210 40% 98%;
+        --primary-foreground: 222.2 47.4% 11.2%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+        --accent: 217.2 32.6% 17.5%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 212.7 26.8% 83.9%;
+      }
+
+      * {
+        border-color: hsl(var(--border));
+      }
+
       body {
-        background-color: #f4f4f4;
-        font-family: "Source Sans Pro", sans-serif;
-        color: #333;
-        padding: 20px;
-      }
-
-      .banner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #2e3d49;
-        color: white;
-        padding: 15px 30px;
-        border-radius: 8px;
-        margin-bottom: 30px;
-      }
-
-      .banner h1 {
-        margin: 0;
-        font-size: 1.8em;
-      }
-
-      .banner button {
-        background-color: #4a5a6a;
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-      }
-
-      .banner button:hover {
-        background-color: #3a4a5a;
-      }
-
-      .section-card {
-        background: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        margin-bottom: 30px;
-      }
-
-      .section-card h2 {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-      }
-
-      .form-label {
-        font-weight: bold;
-        color: #555;
-      }
-
-      .button-group {
-        margin: 20px 0;
-      }
-
-      .btn {
-        font-size: 1em;
-        padding: 10px 20px;
-        border-radius: 5px;
-      }
-
-      .results-table {
-        overflow-x: auto;
-      }
-
-      .table {
-        table-layout: fixed; /* Ensures cells maintain their size */
-        width: 100%;
-      }
-
-      .table th,
-      .table td {
-        vertical-align: middle;
-        white-space: normal; /* Allow text to wrap */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 150px; /* Set a max width for cells */
-      }
-
-      .table th {
-        background-color: #f8f9fa;
-      }
-
-      .table td[contenteditable="true"] {
-        background-color: #e9ecef;
-        cursor: text;
-      }
-
-      .results-table th {
-        background-color: #f8f9fa;
-        font-weight: bold;
-        padding: 12px;
-        text-align: left;
-        border-bottom: 2px solid #dee2e6;
-      }
-
-      .results-table td {
-        padding: 12px;
-        vertical-align: middle;
-      }
-
-      .results-table td[contenteditable="true"] {
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        padding: 8px;
-      }
-
-      .results-table td[contenteditable="true"]:focus {
-        outline: 2px solid #007bff;
-        border: 1px solid #007bff;
+        font-feature-settings: "rlig" 1, "calt" 1;
+        font-family: var(--font-sans);
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
       }
 
       .model-response {
-        margin-bottom: 8px;
+        @apply mb-2;
       }
 
-      .factuality-score {
-        border-top: 1px solid #dee2e6;
-        padding-top: 8px;
-      }
-
+      .factuality-score,
       .response-time {
-        border-top: 1px solid #dee2e6;
-        padding-top: 8px;
-      }
-
-      .text-secondary {
-        color: #6c757d !important;
-      }
-
-      .mt-2 {
-        margin-top: 0.5rem !important;
+        @apply pt-2 border-t text-sm text-muted-foreground;
       }
     </style>
   </head>
-  <body>
-    <div class="container">
+  <body class="min-h-screen p-4 md:p-6 lg:p-8 bg-background text-foreground">
+    <div class="max-w-7xl mx-auto">
       <!-- Banner -->
-      <div class="banner">
-        <h1>LLM Evaluation Platform</h1>
-        <a href="{{ url_for('experiments') }}" class="btn btn-primary"
-          >Experiments</a
+      <div
+        class="flex justify-between items-center bg-card p-6 rounded-lg shadow-sm mb-8"
+      >
+        <h1 class="text-2xl font-bold">LLM Evaluation Platform</h1>
+        <a
+          href="{{ url_for('experiments') }}"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
         >
+          Experiments
+        </a>
       </div>
 
       <!-- Experiment Creation Section -->
-      <div class="section-card">
-        <h2>New Experiment</h2>
+      <div class="bg-card rounded-lg shadow-sm p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-6">New Experiment</h2>
         <form
           id="experimentForm"
           method="post"
           action="{{ url_for('submit_prompt') }}"
         >
-          <div class="mb-3">
-            <label for="experimentName" class="form-label"
+          <div class="mb-4 space-y-2">
+            <label
+              for="experimentName"
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >Experiment Name</label
             >
             <input
               type="text"
-              class="form-control"
+              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="experimentName"
               name="experiment_name"
               value="{{ experiment.name if experiment else '' }}"
@@ -183,10 +121,14 @@
             />
           </div>
 
-          <div class="mb-3">
-            <label for="systemPrompt" class="form-label">System Prompt</label>
+          <div class="mb-4 space-y-2">
+            <label
+              for="systemPrompt"
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >System Prompt</label
+            >
             <textarea
-              class="form-control"
+              class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               id="systemPrompt"
               name="system_prompt"
               rows="4"
@@ -196,56 +138,70 @@
             >
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Select Models</label>
-            <div id="modelSelection">
+          <div class="mb-6 space-y-2">
+            <label class="text-sm font-medium leading-none"
+              >Select Models</label
+            >
+            <div id="modelSelection" class="space-y-2">
               <!-- Commenting out the GPT checkbox -->
               <!--
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="GPT-3.5 Turbo" id="gptCheckbox">
-                  <label class="form-check-label" for="gptCheckbox">
+              <div class="flex items-center space-x-2">
+                  <input class="h-4 w-4 rounded border-border text-primary focus:ring-primary" type="checkbox" value="GPT-3.5 Turbo" id="gptCheckbox">
+                  <label class="text-sm font-medium leading-none" for="gptCheckbox">
                       GPT-3.5 Turbo
                   </label>
               </div>
               -->
-              <div class="form-check">
+              <div class="flex items-center space-x-2">
                 <input
-                  class="form-check-input"
+                  class="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                   type="checkbox"
                   value="Gemini"
                   id="geminiCheckbox"
                 />
-                <label class="form-check-label" for="geminiCheckbox">
+                <label
+                  class="text-sm font-medium leading-none"
+                  for="geminiCheckbox"
+                >
                   Gemini
                 </label>
               </div>
-              <div class="form-check">
+              <div class="flex items-center space-x-2">
                 <input
-                  class="form-check-input"
+                  class="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                   type="checkbox"
                   value="Mistral"
                   id="mistralCheckbox"
                 />
-                <label class="form-check-label" for="mistralCheckbox">
+                <label
+                  class="text-sm font-medium leading-none"
+                  for="mistralCheckbox"
+                >
                   Mistral
                 </label>
               </div>
-              <div class="form-check">
+              <div class="flex items-center space-x-2">
                 <input
-                  class="form-check-input"
+                  class="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                   type="checkbox"
                   value="Llama"
                   id="llamaCheckbox"
                 />
-                <label class="form-check-label" for="llamaCheckbox">
+                <label
+                  class="text-sm font-medium leading-none"
+                  for="llamaCheckbox"
+                >
                   Llama
                 </label>
               </div>
             </div>
           </div>
 
-          <div class="button-group">
-            <button type="submit" class="btn btn-success">
+          <div class="flex gap-2">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            >
               Run Experiment
             </button>
           </div>
@@ -253,12 +209,16 @@
       </div>
 
       <!-- Results Section -->
-      <div class="section-card" id="results-section" style="display: none">
-        <h2>Results</h2>
-        <div class="results-table">
-          <table class="table">
+      <div
+        class="bg-card rounded-lg shadow-sm p-6 mb-8"
+        id="results-section"
+        style="display: none"
+      >
+        <h2 class="text-xl font-semibold mb-6">Results</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
             <thead>
-              <tr>
+              <tr class="border-b">
                 <!-- Headers will be dynamically populated -->
               </tr>
             </thead>
@@ -267,17 +227,26 @@
             </tbody>
           </table>
         </div>
-        <button type="button" class="btn btn-secondary" id="addTestCase">
-          Add Test Case
-        </button>
-        <button type="button" class="btn btn-primary" id="submitTestCases">
-          Submit Test Case
-        </button>
+        <div class="flex gap-2 mt-6">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2"
+            id="addTestCase"
+          >
+            Add Test Case
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            id="submitTestCases"
+          >
+            Submit Test Case
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       $(document).ready(function () {
@@ -339,18 +308,26 @@
 
         // Function to initialize results table
         function initializeResultsTable(selectedModels) {
-          const resultsTable = $(".results-table table");
+          const resultsTable = $("#results-section table");
           resultsTable.empty();
 
           // Create and append thead with headers
           const thead = $("<thead></thead>");
           const headerRow = $("<tr></tr>");
-          headerRow.append("<th>Test Case</th>");
-          headerRow.append("<th>Expected Output</th>");
+          headerRow.append(
+            "<th class='p-3 text-left font-medium'>Test Case</th>"
+          );
+          headerRow.append(
+            "<th class='p-3 text-left font-medium'>Expected Output</th>"
+          );
           selectedModels.forEach((model) => {
-            headerRow.append(`<th>${model}</th>`);
+            headerRow.append(
+              `<th class='p-3 text-left font-medium'>${model}</th>`
+            );
           });
-          headerRow.append("<th>Actions</th>");
+          headerRow.append(
+            "<th class='p-3 text-left font-medium'>Actions</th>"
+          );
           thead.append(headerRow);
           resultsTable.append(thead);
 
@@ -363,19 +340,21 @@
         function loadExistingResponses(responses) {
           const resultsBody = $("#resultsBody");
           responses.forEach((response) => {
-            const row = $("<tr></tr>");
-            row.append(`<td contenteditable="true">${response.test_case}</td>`);
+            const row = $("<tr class='border-b hover:bg-muted/50'></tr>");
             row.append(
-              `<td contenteditable="true">${response.expected_output}</td>`
+              `<td contenteditable='true' class='p-3 align-middle'>${response.test_case}</td>`
+            );
+            row.append(
+              `<td contenteditable='true' class='p-3 align-middle'>${response.expected_output}</td>`
             );
 
             window.selectedModels.forEach((model) => {
               const modelResponse = response[model] || "";
               const factuality = response[`${model}_factuality`] || "";
               row.append(`
-                            <td>
-                              <div class="model-response">${modelResponse}</div>
-                              <div class="factuality-score small text-secondary mt-2">
+                            <td class='p-3 align-middle'>
+                              <div class='model-response'>${modelResponse}</div>
+                              <div class='factuality-score'>
                                 Factuality Score: ${factuality}
                               </div>
                             </td>
@@ -383,8 +362,8 @@
             });
 
             row.append(`
-                          <td>
-                            <button class="btn btn-danger btn-sm delete-test-case">Delete</button>
+                          <td class='p-3 align-middle'>
+                            <button class='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3 delete-test-case'>Delete</button>
                           </td>
                         `);
             resultsBody.append(row);
@@ -398,15 +377,19 @@
             return;
           }
 
-          const newRow = $("<tr></tr>");
-          newRow.append("<td contenteditable='true'></td>");
-          newRow.append("<td contenteditable='true'></td>");
+          const newRow = $("<tr class='border-b hover:bg-muted/50'></tr>");
+          newRow.append(
+            "<td contenteditable='true' class='p-3 align-middle'></td>"
+          );
+          newRow.append(
+            "<td contenteditable='true' class='p-3 align-middle'></td>"
+          );
           window.selectedModels.forEach(() => {
-            newRow.append("<td></td>");
+            newRow.append("<td class='p-3 align-middle'></td>");
           });
           newRow.append(`
-                        <td>
-                          <button class="btn btn-danger btn-sm delete-test-case">Delete</button>
+                        <td class='p-3 align-middle'>
+                          <button class='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3 delete-test-case'>Delete</button>
                         </td>
                       `);
           $("#resultsBody").append(newRow);
@@ -422,11 +405,17 @@
           const lastRow = $("#resultsBody tr").last();
           const testCase = lastRow.find("td:eq(0)").text().trim();
           const expectedOutput = lastRow.find("td:eq(1)").text().trim();
+          const systemPrompt = $("#systemPrompt").val().trim();
 
           if (!testCase || !expectedOutput) {
             alert(
               "Please ensure the last test case and expected output are filled."
             );
+            return;
+          }
+
+          if (!systemPrompt) {
+            alert("Please provide a system prompt.");
             return;
           }
 
@@ -436,6 +425,7 @@
             contentType: "application/json",
             data: JSON.stringify({
               test_cases: [{ testCase, expectedOutput }],
+              system_prompt: systemPrompt,
               selected_models: $("#modelSelection input:checked")
                 .map(function () {
                   return $(this).val();
@@ -453,9 +443,11 @@
           const resultsBody = $("#resultsBody");
           resultsBody.empty();
           responses.forEach(function (res) {
-            const row = $("<tr></tr>");
-            row.append(`<td>${res.test_case}</td>`);
-            row.append(`<td>${res.expected_output}</td>`);
+            const row = $("<tr class='border-b hover:bg-muted/50'></tr>");
+            row.append(`<td class='p-3 align-middle'>${res.test_case}</td>`);
+            row.append(
+              `<td class='p-3 align-middle'>${res.expected_output}</td>`
+            );
             window.selectedModels.forEach((model) => {
               const modelResponse = res[model] || "";
               const factuality = calculateFactuality(
@@ -464,20 +456,20 @@
               );
               const responseTime = res[`${model}_response_time`] || "N/A";
               row.append(`
-                            <td>
-                              <div class="model-response">${modelResponse}</div>
-                              <div class="factuality-score small text-secondary mt-2">
+                            <td class='p-3 align-middle'>
+                              <div class='model-response'>${modelResponse}</div>
+                              <div class='factuality-score'>
                                 Factuality Score: ${factuality}%
                               </div>
-                              <div class="response-time small text-secondary mt-2">
+                              <div class='response-time'>
                                 Response Time: ${responseTime}
                               </div>
                             </td>
                           `);
             });
             row.append(`
-                          <td>
-                            <button class="btn btn-danger btn-sm delete-test-case">Delete</button>
+                          <td class='p-3 align-middle'>
+                            <button class='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3 delete-test-case'>Delete</button>
                           </td>
                         `);
             resultsBody.append(row);
